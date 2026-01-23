@@ -4,7 +4,6 @@ from flwr.serverapp.strategy import FedAvg
 from flwr.common import ndarrays_to_parameters, parameters_to_ndarrays
 from flwr.common import ArrayRecord
 
-# Import utils
 from pytorchexample.utils import load_client_updates, ndarrays_to_vector, vector_to_ndarrays
 
 log = logging.getLogger(__name__)
@@ -21,7 +20,6 @@ class EraserStrategy(FedAvg):
         """
         log.info(f"--> [FedEraser] Round {server_round}: Calibrating updates...")
         
-        # Danh sách tin nhắn sau khi đã hiệu chỉnh
         calibrated_replies = []
 
         for msg in train_replies:
@@ -31,19 +29,18 @@ class EraserStrategy(FedAvg):
             
             client_id = str(msg.metadata.src_node_id)
             
-            # Nếu là client cần xóa thì bỏ qua (dù filter đã lọc, check lại cho chắc)
             if client_id == str(self.unlearn_cid):
                 continue
 
             if "arrays" in msg.content:
                 try:
-                    # --- BƯỚC 1: LẤY UPDATE MỚI (New) ---
+                    # --- BƯỚC 1: LẤY UPDATE MỚI ---
                     array_record = msg.content["arrays"]
                     # Chuyển sang List[Numpy] -> Tensor Vector
                     new_ndarrays = [v.numpy() for v in array_record.values()]
                     new_vec = ndarrays_to_vector(new_ndarrays)
                     
-                    # --- BƯỚC 2: LOAD UPDATE CŨ (Old) ---
+                    # --- BƯỚC 2: LOAD UPDATE CŨ ---
                     # Load từ file log lịch sử
                     old_ndarrays = load_client_updates(self.log_dir, server_round, client_id)
                     old_vec = ndarrays_to_vector(old_ndarrays)
@@ -63,7 +60,6 @@ class EraserStrategy(FedAvg):
                     calibrated_ndarrays = vector_to_ndarrays(calibrated_vec, new_ndarrays)
                     
                     # Cập nhật lại nội dung ArrayRecord trong tin nhắn
-                    # Lưu ý: Cần giữ nguyên key (tên layer) của ArrayRecord cũ
                     updated_dict = {}
                     keys = list(array_record.keys()) # Lấy danh sách tên layer
                     
@@ -80,5 +76,4 @@ class EraserStrategy(FedAvg):
 
             calibrated_replies.append(msg)
 
-        # Gọi hàm gốc với danh sách tin nhắn ĐÃ CHỈNH SỬA
         return super().aggregate_train(server_round, calibrated_replies)

@@ -2,7 +2,6 @@ import logging
 from flwr.serverapp.strategy import FedAvg
 from flwr.common import ndarrays_to_parameters
 
-# Import hàm save từ utils
 from pytorchexample.utils import save_client_updates
 
 log = logging.getLogger(__name__)
@@ -34,7 +33,6 @@ class LogStrategy(FedAvg):
                 array_record = content["arrays"]
                 
                 # 3. Chuyển đổi ArrayRecord -> List[Numpy] -> Parameters
-                # (Để tái sử dụng hàm save_client_updates trong utils.py)
                 try:
                     # Lấy các mảng numpy từ ArrayRecord
                     # Lưu ý: ArrayRecord lưu dưới dạng Dict, ta lấy values() 

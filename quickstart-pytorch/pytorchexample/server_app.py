@@ -28,9 +28,9 @@ def main(grid: Grid, context: Context) -> None:
     mode: str = context.run_config.get("mode", "train")
     unlearn_cid: str = context.run_config.get("unlearn-cid", "0")
 
-    print(f"🚀 STARTING SERVER IN MODE: {mode.upper()}")
+    print(f"STARTING SERVER IN MODE: {mode.upper()}")
     if mode == "unlearn":
-        print(f"🎯 TARGET CLIENT TO REMOVE: {unlearn_cid}")
+        print(f"TARGET CLIENT TO REMOVE: {unlearn_cid}")
 
     # 2. Định nghĩa thư mục lưu log lịch sử
     # Lưu tại thư mục gốc dự án/history_logs
@@ -41,7 +41,7 @@ def main(grid: Grid, context: Context) -> None:
     global_model = Net()
     arrays = ArrayRecord(global_model.state_dict())
 
-    # 4. CHỌN CHIẾN THUẬT (STRATEGY) DỰA TRÊN MODE
+    # 4. CHỌN STRATEGY) DỰA TRÊN MODE
     if mode == "train":
         # Chế độ Train: Sử dụng LogStrategy để vừa train vừa lưu file updates
         strategy = LogStrategy(
