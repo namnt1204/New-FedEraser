@@ -25,32 +25,34 @@ class LogStrategy(FedAvg):
                 continue
             
             # 1. Lấy ID và Dữ liệu
-            client_id = msg.metadata.src_node_id
             content = msg.content
             
-            # 2. Kiểm tra xem có chứa 'arrays' (trọng số) không
-            if "arrays" in content:
-                array_record = content["arrays"]
-                
-                # 3. Chuyển đổi ArrayRecord -> List[Numpy] -> Parameters
-                try:
-                    # Lấy các mảng numpy từ ArrayRecord
-                    # Lưu ý: ArrayRecord lưu dưới dạng Dict, ta lấy values() 
-                    # để có danh sách các layer weights.
-                    ndarrays = [v.numpy() for v in array_record.values()]
+            if "metrics" in content and "partition_id" in content["metrics"]:
+                client_id = content["metrics"]["partition_id"]
+            
+                # 2. Kiểm tra xem có chứa 'arrays' (trọng số) không
+                if "arrays" in content:
+                    array_record = content["arrays"]
                     
-                    # Đóng gói thành Parameters
-                    parameters = ndarrays_to_parameters(ndarrays)
-                    
-                    # 4. Lưu xuống đĩa
-                    save_client_updates(
-                        save_dir=self.log_dir,
-                        round_num=server_round,
-                        client_id=str(client_id),
-                        parameters=parameters
-                    )
-                except Exception as e:
-                    log.error(f"Failed to save update from client {client_id}: {e}")
+                    # 3. Chuyển đổi ArrayRecord -> List[Numpy] -> Parameters
+                    try:
+                        # Lấy các mảng numpy từ ArrayRecord
+                        # Lưu ý: ArrayRecord lưu dưới dạng Dict, ta lấy values() 
+                        # để có danh sách các layer weights.
+                        ndarrays = [v.numpy() for v in array_record.values()]
+                        
+                        # Đóng gói thành Parameters
+                        parameters = ndarrays_to_parameters(ndarrays)
+                        
+                        # 4. Lưu xuống đĩa
+                        save_client_updates(
+                            save_dir=self.log_dir,
+                            round_num=server_round,
+                            client_id=str(client_id),
+                            parameters=parameters
+                        )
+                    except Exception as e:
+                        log.error(f"Failed to save update from client {client_id}: {e}")
 
         # --- GỌI LOGIC GỐC ---
         # Để FedAvg tính toán trung bình cộng như bình thường

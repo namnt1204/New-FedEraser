@@ -27,12 +27,19 @@ def train(msg: Message, context: Context):
     num_partitions = context.node_config["num-partitions"]
     batch_size = context.run_config["batch-size"]
     trainloader, _ = load_data(partition_id, num_partitions, batch_size)
+    
+    config = msg.content["config"]
+    mode = config.get("mode", "train")
+    epochs = config.get("local_epochs", context.run_config["local-epochs"])
+
+    if mode == "unlearn":
+        epochs = max(1, int(epochs * 0.5))
 
     # Call the training function
     train_loss = train_fn(
         model,
         trainloader,
-        context.run_config["local-epochs"],
+        epochs,
         msg.content["config"]["lr"],
         device,
     )
@@ -42,6 +49,7 @@ def train(msg: Message, context: Context):
     metrics = {
         "train_loss": train_loss,
         "num-examples": len(trainloader.dataset),
+        "partition_id": partition_id
     }
     metric_record = MetricRecord(metrics)
     content = RecordDict({"arrays": model_record, "metrics": metric_record})
