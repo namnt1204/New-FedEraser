@@ -21,7 +21,7 @@ Biểu đồ dưới đây so sánh độ chính xác trên tập dữ liệu ki
 * Các phương pháp FedEraser, Adaptive và Top-K đều duy trì được độ chính xác trên Testing Data ở mức cao (tương đương FedRetrain).
 * Độ chính xác trên Target Data của Top-K giảm xuống rõ rệt, chứng tỏ mô hình đã "quên" dữ liệu của client mục tiêu thành công.
 
-![Prediction Performance](Fig1_Prediction_Accuracy.png)
+![Prediction Performance](quickstart-pytorch/Fig1_Prediction_Accuracy.png)
 
 ### 2. Khả năng Phòng thủ Quyền riêng tư (MIA Attack)
 Để kiểm chứng việc dữ liệu đã thực sự bị xóa, chúng tôi sử dụng phương pháp Tấn công Suy luận Thành viên (Membership Inference Attacks - MIA). 
@@ -29,7 +29,7 @@ Biểu đồ dưới đây so sánh độ chính xác trên tập dữ liệu ki
 * **MIA Recall** thể hiện tỷ lệ kẻ tấn công đoán trúng dữ liệu mục tiêu từng nằm trong tập huấn luyện.
 * Cả FedEraser, Adaptive và đặc biệt là Top-K đều làm giảm đáng kể chỉ số MIA Recall so với mô hình gốc, chứng minh hiệu quả bảo vệ quyền riêng tư mạnh mẽ.
 
-![MIA Performance](Fig2_MIA_Performance.png)
+![MIA Performance](quickstart-pytorch/Fig2_MIA_Performance.png)
 
 ### 3. Độ Lệch Không Gian Tham Số (Parameter Deviation)
 Chỉ số này đo lường góc lệch $\theta$ của các tham số ở layer cuối cùng giữa các mô hình Unlearned so với mô hình FedRetrain (Baseline).
@@ -37,7 +37,7 @@ Chỉ số này đo lường góc lệch $\theta$ của các tham số ở layer
 * Nhờ việc cố định trọng số khởi tạo (Hardcoded Initial Weights), các phương pháp unlearning đều hội tụ về cùng một không gian tham số với mô hình chuẩn. 
 * Góc lệch của FedEraser và Adaptive chỉ khoảng $7.4^\circ$, và Top-K là $11.8^\circ$. Điều này chứng minh các phương pháp xấp xỉ của chúng tôi tìm ra được bộ trọng số gần như tương đương với việc huấn luyện lại từ đầu.
 
-![Parameter Deviation](Fig3_Parameter_Deviation.png)
+![Parameter Deviation](quickstart-pytorch/Fig3_Parameter_Deviation.png)
 
 ### 4. Tổng Thời Gian Thực Thi (End-to-End Time Consumption)
 Đây là minh chứng rõ ràng nhất cho tính hiệu quả của dự án. Thời gian tính toán bao gồm toàn bộ quá trình giao tiếp mạng và huấn luyện nội bộ tại client.
@@ -46,7 +46,7 @@ Chỉ số này đo lường góc lệch $\theta$ của các tham số ở layer
 * **FedEraser** và **Adaptive** giảm được đáng kể thời gian nhờ tái sử dụng lịch sử.
 * Thuật toán **Top-K** cho thấy sự vượt trội tuyệt đối khi tiết kiệm được hơn 50% thời gian so với Baseline, trở thành phương pháp hiệu quả nhất để triển khai thực tế.
 
-![Time Consumption](Fig4_Time_Consumption.png)
+![Time Consumption](quickstart-pytorch/Fig4_Time_Consumption.png)
 
 ---
 
