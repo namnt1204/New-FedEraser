@@ -1,5 +1,8 @@
 import logging
 import torch
+import time
+import json
+import os
 from flwr.serverapp.strategy import FedAvg
 from flwr.common import ArrayRecord
 
@@ -13,6 +16,7 @@ class AdaptiveEraserStrategy(FedAvg):
         self.log_dir = log_dir
         self.unlearn_cid = str(unlearn_cid)
         self.saved_rounds_list = saved_rounds_list # Danh sách [1, 5, 8...]
+        self.global_start_time = time.time()
 
     def aggregate_train(self, server_round, train_replies):
         # --- MAPPING ROUND ---
@@ -79,4 +83,21 @@ class AdaptiveEraserStrategy(FedAvg):
 
             calibrated_replies.append(msg)
 
-        return super().aggregate_train(server_round, calibrated_replies)
+        aggregated_result = super().aggregate_train(server_round, calibrated_replies)
+        
+        total_e2e_time = time.time() - self.global_start_time
+        log.info(f"🕒 [Adaptive] Total E2E Time up to round {server_round}: {total_e2e_time:.4f}s")
+        
+        time_file = "unlearn_times.json"
+        try:
+            times = {}
+            if os.path.exists(time_file):
+                with open(time_file, "r") as f:
+                    times = json.load(f)
+            times["Adaptive"] = total_e2e_time
+            with open(time_file, "w") as f:
+                json.dump(times, f, indent=4)
+        except Exception as e:
+            log.error(f"Error: {e}")
+
+        return aggregated_result

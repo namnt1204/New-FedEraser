@@ -13,6 +13,7 @@ from pytorchexample.task import Net, load_centralized_dataset, test
 # Import Baseline
 from pytorchexample.strategy.log_strategy import LogStrategy
 from pytorchexample.strategy.eraser_strategy import EraserStrategy
+from pytorchexample.strategy.retrain_strategy import RetrainStrategy
 
 # Import Adaptive (Threshold)
 from pytorchexample.strategy.adaptive_log_strategy import AdaptiveLogStrategy
@@ -65,6 +66,8 @@ def main(grid: Grid, context: Context) -> None:
     # --- CHỌN CHIẾN THUẬT ---
     if mode == "train":
         strategy = LogStrategy(log_dir=log_dir, fraction_evaluate=fraction_evaluate)
+    elif mode == "retrain":
+        strategy = RetrainStrategy(unlearn_cid=unlearn_cid, fraction_evaluate=fraction_evaluate)
     elif mode == "unlearn":
         strategy = EraserStrategy(log_dir=log_dir, unlearn_cid=unlearn_cid, fraction_evaluate=fraction_evaluate)
         

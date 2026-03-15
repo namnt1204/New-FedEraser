@@ -1,6 +1,8 @@
 import logging
 import torch
 import os
+import time
+import json
 from flwr.serverapp.strategy import FedAvg
 from flwr.common import ndarrays_to_parameters, parameters_to_ndarrays
 from flwr.common import ArrayRecord
@@ -14,6 +16,7 @@ class EraserStrategy(FedAvg):
         super().__init__(*args, **kwargs)
         self.log_dir = log_dir
         self.unlearn_cid = str(unlearn_cid)
+        self.global_start_time = time.time()
 
     def aggregate_train(self, server_round, train_replies):
         """
@@ -74,7 +77,7 @@ class EraserStrategy(FedAvg):
                         # ArrayRecord chấp nhận dict nếu value là Tensor (giống state_dict)
                         updated_dict[key] = torch.from_numpy(calibrated_ndarrays[i])
                     
-                    # Thay thế arrays cũ bằng arrays đã hiệu chỉnh
+                    
                     msg.content["arrays"] = ArrayRecord(updated_dict)
                     
                 except FileNotFoundError:
@@ -84,4 +87,21 @@ class EraserStrategy(FedAvg):
 
             calibrated_replies.append(msg)
 
-        return super().aggregate_train(server_round, calibrated_replies)
+        aggregated_result = super().aggregate_train(server_round, calibrated_replies)
+        
+        total_e2e_time = time.time() - self.global_start_time
+        log.info(f"🕒 Total E2E Time up to round {server_round}: {total_e2e_time:.4f}s")
+
+        time_file = "unlearn_times.json"
+        try:
+            times = {}
+            if os.path.exists(time_file):
+                with open(time_file, "r") as f:
+                    times = json.load(f)
+            times["FedEraser"] = total_e2e_time
+            with open(time_file, "w") as f:
+                json.dump(times, f, indent=4)
+        except Exception as e:
+            log.error(f"Error: {e}")
+
+        return aggregated_result
