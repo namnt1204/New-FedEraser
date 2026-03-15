@@ -3,6 +3,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import random
+import numpy as np
 from datasets import load_dataset
 from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import IidPartitioner
@@ -79,6 +81,12 @@ def load_centralized_dataset():
 
 def train(net, trainloader, epochs, lr, device):
     """Train the model on the training set."""
+    torch.manual_seed(42)
+    np.random.seed(42)
+    random.seed(42)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(42)
+        
     net.to(device)  # move model to GPU if available
     criterion = torch.nn.CrossEntropyLoss().to(device)
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9)

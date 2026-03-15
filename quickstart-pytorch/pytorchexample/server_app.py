@@ -37,18 +37,16 @@ def main(grid: Grid, context: Context) -> None:
 
     print(f"STARTING SERVER IN MODE: {mode.upper()}")
 
-    # --- ĐỊNH NGHĨA THƯ MỤC LOG RIÊNG BIỆT ---
     if "topk" in mode:
-        log_dir = "topk_logs"       # Thư mục cho phương pháp Top-K
+        log_dir = "topk_logs"       
     elif "adaptive" in mode:
-        log_dir = "adaptive_logs"   # Thư mục cho phương pháp Threshold
+        log_dir = "adaptive_logs"   
     else:
-        log_dir = "history_logs"    # Thư mục cho phương pháp Gốc
+        log_dir = "history_logs"    
     
     os.makedirs(log_dir, exist_ok=True)
     saved_rounds_list = []
 
-    # Xử lý load history cho các mode Unlearn đặc biệt
     if mode == "adaptive_unlearn" or mode == "topk_unlearn":
         history_file = os.path.join(log_dir, "saved_rounds.json")
         if os.path.exists(history_file):
@@ -60,10 +58,12 @@ def main(grid: Grid, context: Context) -> None:
             print(f"--> [{mode}] ERROR: No saved_rounds.json found in {log_dir}!")
             return 
 
+    # --- ĐÂY LÀ ĐIỂM CỐ ĐỊNH MÔ HÌNH ---
+    # Khi cố định seed ở đây, Net() sẽ sinh ra một tập trọng số y hệt nhau ở mọi lần chạy
+    torch.manual_seed(42)
     global_model = Net()
     arrays = ArrayRecord(global_model.state_dict())
 
-    # --- CHỌN CHIẾN THUẬT ---
     if mode == "train":
         strategy = LogStrategy(log_dir=log_dir, fraction_evaluate=fraction_evaluate)
     elif mode == "retrain":
@@ -80,13 +80,12 @@ def main(grid: Grid, context: Context) -> None:
             log_dir=log_dir, unlearn_cid=unlearn_cid, saved_rounds_list=saved_rounds_list, fraction_evaluate=fraction_evaluate
         )
         
-    # --- TOP-K STRATEGIES ---
     elif mode == "topk_train":
         strategy = TopKLogStrategy(
             log_dir=log_dir,
-            k_value=30,             # <--- Giữ lại đúng 20 round quan trọng nhất
+            k_value=30,             
             total_rounds=num_rounds,
-            decay_factor=0.95,       # Vẫn dùng decay để ưu tiên round cuối
+            decay_factor=0.95,       
             fraction_evaluate=fraction_evaluate
         )
     elif mode == "topk_unlearn":
@@ -104,6 +103,7 @@ def main(grid: Grid, context: Context) -> None:
     print(f"⏱️  STARTED TIMING FOR MODE: {mode}...")
     start_time = time.time()
 
+    # Trọng số khởi tạo cố định (arrays) được truyền vào đây
     result = strategy.start(
         grid=grid,
         initial_arrays=arrays,
