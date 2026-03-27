@@ -235,13 +235,13 @@ def test(net, testloader, device):
 # MÔ HÌNH VÀ CÁC HÀM CHO Du lieu Adult 
 # =========================================================================================
 
-# class AdultNet(nn.Module):
+# class Net(nn.Module):
 #     """Mô hình Neural Network cho tập dữ liệu Adult gồm: 2 FC layers."""
 # 
 #     def __init__(self, input_dim=104): 
 #         # input_dim phụ thuộc vào số lượng feature sau khi One-hot encoding.
 #         # Thường bộ dữ liệu Adult sau khi xử lý sẽ có khoảng 104-108 features.
-#         super(AdultNet, self).__init__()
+#         super(Net, self).__init__()
 #         self.fc1 = nn.Linear(input_dim, 128)
 #         self.fc2 = nn.Linear(128, 2) # Phân loại nhị phân (>50K hoặc <=50K)
 # 
@@ -250,32 +250,32 @@ def test(net, testloader, device):
 #         x = self.fc2(x)
 #         return x
 # 
-# fds_adult = None  
+# fds = None  
 # 
-# def apply_transforms_adult(batch):
+# def apply_transforms(batch):
 #     """Chuyển đổi dữ liệu bảng thành PyTorch Tensors."""
 #     # Giả định dữ liệu đã được số hóa và lưu ở key 'features'
 #     batch["features"] = [torch.tensor(feat, dtype=torch.float32) for feat in batch["features"]]
 #     return batch
 # 
-# def load_data_adult(partition_id: int, num_partitions: int, batch_size: int):
+# def load_data(partition_id: int, num_partitions: int, batch_size: int):
 #     """Load partition Adult data."""
-#     global fds_adult
-#     if fds_adult is None:
+#     global fds
+#     if fds is None:
 #         partitioner = IidPartitioner(num_partitions=num_partitions)
-#         fds_adult = FederatedDataset(
+#         fds= FederatedDataset(
 #             dataset="adult", # Cần đảm bảo dataset name khớp với HuggingFace hoặc local
 #             partitioners={"train": partitioner},
 #         )
-#     partition = fds_adult.load_partition(partition_id)
+#     partition = fds.load_partition(partition_id)
 #     partition_train_test = partition.train_test_split(test_size=0.2, seed=42)
-#     partition_train_test = partition_train_test.with_transform(apply_transforms_adult)
+#     partition_train_test = partition_train_test.with_transform(apply_transforms)
 #     
 #     trainloader = DataLoader(partition_train_test["train"], batch_size=batch_size, shuffle=True)
 #     testloader = DataLoader(partition_train_test["test"], batch_size=batch_size)
 #     return trainloader, testloader
 # 
-# def train_adult(net, trainloader, epochs, lr, device):
+# def train(net, trainloader, epochs, lr, device):
 #     net.to(device)
 #     criterion = torch.nn.CrossEntropyLoss().to(device)
 #     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9)
@@ -292,7 +292,7 @@ def test(net, testloader, device):
 #             running_loss += loss.item()
 #     return running_loss / len(trainloader)
 # 
-# def test_adult(net, testloader, device):
+# def test(net, testloader, device):
 #     net.to(device)
 #     criterion = torch.nn.CrossEntropyLoss()
 #     correct, loss = 0, 0.0
@@ -312,12 +312,12 @@ def test(net, testloader, device):
 # MÔ HÌNH VÀ CÁC HÀM CHO Dữ liệu Purchase
 # =========================================================================================
 
-# class PurchaseNet(nn.Module):
+# class Net(nn.Module):
 #     """Mô hình Neural Network cho tập dữ liệu Purchase gồm: 3 FC layers."""
 # 
 #     def __init__(self, input_dim=600):
 #         # input_dim thường là 600 đối với Purchase dataset (dựa trên 600 loại mặt hàng)
-#         super(PurchaseNet, self).__init__()
+#         super(Net, self).__init__()
 #         self.fc1 = nn.Linear(input_dim, 256)
 #         self.fc2 = nn.Linear(256, 128)
 #         self.fc3 = nn.Linear(128, 2) # Gom thành 2 cụm (2 classes) theo paper
@@ -328,31 +328,31 @@ def test(net, testloader, device):
 #         x = self.fc3(x)
 #         return x
 # 
-# fds_purchase = None  
+# fds = None  
 # 
-# def apply_transforms_purchase(batch):
+# def apply_transforms(batch):
 #     """Chuyển đổi dữ liệu Purchase thành PyTorch Tensors."""
 #     batch["features"] = [torch.tensor(feat, dtype=torch.float32) for feat in batch["features"]]
 #     return batch
 # 
-# def load_data_purchase(partition_id: int, num_partitions: int, batch_size: int):
+# def load_data(partition_id: int, num_partitions: int, batch_size: int):
 #     """Load partition Purchase data."""
-#     global fds_purchase
-#     if fds_purchase is None:
+#     global fds
+#     if fds is None:
 #         partitioner = IidPartitioner(num_partitions=num_partitions)
-#         fds_purchase = FederatedDataset(
+#         fds= FederatedDataset(
 #             dataset="purchase", # Tùy thuộc vào source chứa Purchase dataset
 #             partitioners={"train": partitioner},
 #         )
-#     partition = fds_purchase.load_partition(partition_id)
+#     partition = fds.load_partition(partition_id)
 #     partition_train_test = partition.train_test_split(test_size=0.2, seed=42)
-#     partition_train_test = partition_train_test.with_transform(apply_transforms_purchase)
+#     partition_train_test = partition_train_test.with_transform(apply_transforms)
 #     
 #     trainloader = DataLoader(partition_train_test["train"], batch_size=batch_size, shuffle=True)
 #     testloader = DataLoader(partition_train_test["test"], batch_size=batch_size)
 #     return trainloader, testloader
 # 
-# def train_purchase(net, trainloader, epochs, lr, device):
+# def train(net, trainloader, epochs, lr, device):
 #     net.to(device)
 #     criterion = torch.nn.CrossEntropyLoss().to(device)
 #     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9)
@@ -369,7 +369,7 @@ def test(net, testloader, device):
 #             running_loss += loss.item()
 #     return running_loss / len(trainloader)
 # 
-# def test_purchase(net, testloader, device):
+# def test(net, testloader, device):
 #     net.to(device)
 #     criterion = torch.nn.CrossEntropyLoss()
 #     correct, loss = 0, 0.0
