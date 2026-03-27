@@ -65,6 +65,7 @@ python3 -m venv unlearning_env
 source unlearning_env/bin/activate
 
 # Cài đặt Flower framework và 1 số thư viện liên quan.
+```bash
 pip install --upgrade pip
 pip install "flwr[simulation]" torch torchvision flwr-datasets datasets numpy
 
