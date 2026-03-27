@@ -54,21 +54,27 @@ Chỉ số này đo lường góc lệch $\theta$ của các tham số ở layer
 
 Dự án yêu cầu cài đặt môi trường với `flwr[simulation]`, `torch`, và `torchvision`. 
 
-# Cập nhật hệ thống và cài đặt python3-venv nếu chưa có
+### Cập nhật hệ thống và cài đặt python3-venv nếu chưa có
+```bash
 sudo apt update
 sudo apt install python3 python3-pip python3-venv -y
+```
 
-# Tạo môi trường ảo có tên 'unlearning_env'
+### Tạo môi trường ảo có tên 'unlearning_env'
+```bash
 python3 -m venv unlearning_env
+```
 
-# Kích hoạt môi trường ảo
+### Kích hoạt môi trường ảo
+```bash
 source unlearning_env/bin/activate
+```
 
-# Cài đặt Flower framework và 1 số thư viện liên quan.
+### Cài đặt Flower framework và 1 số thư viện liên quan.
 ```bash
 pip install --upgrade pip
 pip install "flwr[simulation]" torch torchvision flwr-datasets datasets numpy
-
+```
 Để chạy liên tục toàn bộ quy trình (Train mô hình gốc $\rightarrow$ Unlearn bằng các phương pháp $\rightarrow$ Retrain baseline $\rightarrow$ Đánh giá và xuất biểu đồ), hãy thực thi chuỗi lệnh sau trong terminal:
 
 ```bash
